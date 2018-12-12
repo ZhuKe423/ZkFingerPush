@@ -1,0 +1,132 @@
+﻿# -*- coding: utf-8 -*-
+把pymongo版本降低到3.2
+
+
+New AttLog data_request :
+	{
+		"token": "gh_2837e31e28ed",
+		"SN"   : "XXXXXXXXXXXXXXX",      #设备SN 号
+		"record": {
+			"PIN": "1",
+			"TIME": "2017-08-01 13:40:38",
+			"STATUS": 255, 
+			"VERIFY": "2", 
+			"WORKCODE": "0", 
+			"RESERVED1": "0",
+ 			"RESERVED2": "0"
+ 		}
+ 	}
+New AttLog data_request : 
+	{"state" : 'OK',"SN":"XXXXXXXXXXXXXXX"}
+
+
+Sync AttLog data_request :  
+	{
+		"token": "gh_2837e31e28ed",
+		"SN"   : "XXXXXXXXXXXXXXX",      #设备SN 号
+		"records": [
+			{
+				"PIN": "1", 
+				"TIME": "2017-08-01 13:40:38", 
+				"STATUS": 255, 
+				"VERIFY": "2", 
+				"WORKCODE": "0", 
+				"RESERVED1": "0",
+	 			"RESERVED2": "0"
+	 		},
+			{
+				"PIN": "2", 
+				"TIME": "2017-08-01 13:41:38", 
+				"STATUS": 255, 
+				"VERIFY": "2", 
+				"WORKCODE": "0", 
+				"RESERVED1": "0",
+	 			"RESERVED2": "0"
+	 		},	
+	 		....
+	 	] 		
+ 	} 
+Sync AttLog data_request : 
+	{"state" : 'OK',"SN":"XXXXXXXXXXXXXXX"}
+
+
+Update User Infor data_request :
+	{
+		"token": "gh_2837e31e28ed"
+		"SN"   : "XXXXXXXXXXXXXXX"
+		"timeStamp" :  122344556   #这个是设备上一次的时间戳，如何时间戳跟服务器上一样，就不返回"update_users"和"dele_users"字段
+	}
+Update User Infor data_response :
+	{
+		"state"  : 'OK',
+		"SN"   : "XXXXXXXXXXXXXXX",      #设备SN 号
+		"timeStamp" : 122344556        *这个必须要有，timeStamp 是用户数据更新的时间戳，不是访问时当前的时间戳， 设备这侧发现是跟上一次的时间戳值一样就会放弃修改。
+		"update_users" : [
+				{
+                    'PIN'       : '1',
+                    'Name'      : '陈',
+                    'Pri'       : '0' ,   # 权限(14 管理员,0 普通用户)
+                    'Passwd'    : '123',
+                    'Card'      : '15895470',              #用户卡号
+                    'Grp'       : '1',                  #组别(用于门禁)
+                    'TZ'        : '0001000100000000',   #时段(用于门禁)
+				},
+				.......
+		    ]
+		"dele_users" : [
+				{
+                    'PIN'       : '1',
+                    'Name'      : '陈',
+                    'Pri'       : '0' ,   # 权限(14 管理员,0 普通用户)
+                    'Passwd'    : '123',
+                    'Card'      : '15895470',              #用户卡号
+                    'Grp'       : '1',                  #组别(用于门禁)
+                    'TZ'        : '0001000100000000',   #时段(用于门禁)
+				},
+				.......
+		    ]
+	}
+
+Device Command Error Logs:
+    {
+        "token": "gh_2837e31e28ed",
+        "log_data" :
+                {
+                    'SN'  : 'XXXXXXXXXXXXXXX',
+                    'type': 'CMD_FAILED',
+                    'content': format("%s ;return %d . %s" % (self.cmd_line_buf[response['cmdIds']].cmd,response['state'],date_time)),
+                    'wTime': 1213443553
+                }
+    }
+
+Get Command data_request :
+	{
+		"token": "gh_2837e31e28ed",
+		"SN"   : "XXXXXXXXXXXXXXX",      #设备SN 号
+	}
+Get Command data_response :
+	{
+	    "timeStamp" :  123344455,
+	    "SN"        : "XXXXXXXXXXXXXXX"     #设备SN 号
+	    "cmd_list"  :
+            {
+                "getErroLog" : {'start': s_timeStamp,'end':e_timeStamp},
+                "updatestd"  : '',
+                "syncAttLog" : '',
+                "clearAll"   : '',
+	”getDeviceInfo“：‘’，
+                .....
+            }
+	}
+
+
+
+
+
+树莓派3 环境安装：
+
+1. apt-get install libcurl-dev
+2. pip3 install pycurl
+3. pip3 install tornado
+4. apt-get install MongoDB
+5. pip3 install pymongo
