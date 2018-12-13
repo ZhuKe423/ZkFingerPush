@@ -129,9 +129,9 @@ class ServerCmdProcessor:
         }
         print('parse_server_cmd in:', response)
         if 'cmd_list' in response:
-            cmds = response['cmd_list']
-            if len(cmds) > 0:
-                for (k, v) in cmds.items():
+            cmd = response['cmd_list']
+            if len(cmd) > 0:
+                for (k, v) in cmd.items():
                     if k in cmd_dispatch:
                         cmd_dispatch[k](v)
                     else:

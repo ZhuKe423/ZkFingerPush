@@ -23,7 +23,7 @@ def initialize_database():
     global MongoDBClient
     global zkpush_db
     MongoDBClient = MongoClient('localhost', 27017)
-    zkpush_db = MongoDBClient['zkpush']
+    zkpush_db = MongoDBClient['zkfpush']
     info_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'],
              '树莓派('+SystemSettings['GeneralSetting']['raspyNumSerialNum']+')开机！！')
 

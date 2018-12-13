@@ -54,7 +54,7 @@ class IClockHandle:
         self.heart_beat = db.get_heartbeat_setting(clock_sn)
         if self.heart_beat is None:
             self.heart_beat = DefaultHeartBeatSetting
-            self.heart_beat[''] += random.randrange(0, 600, 30)
+            self.heart_beat['syncAttLogTime'] += random.randrange(0, 600, 17)
             db.update_heartbeat_setting(clock_sn, DefaultHeartBeatSetting)
         info_log(self.sn, '考勤机('+self.sn+')上线！！')
         CmdGenerator.clock_info(self.sn)
