@@ -17,7 +17,6 @@ def debug_decorate(func):
     return decorated
 
 
-
 def get_option_all(clock_sn, command, content=None):
     cmd_lines = CmdGenerator.options_all(clock_sn, clock_handle(clock_sn).get_options())
     return cmd_lines

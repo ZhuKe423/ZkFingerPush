@@ -10,50 +10,69 @@ ServerProcessor = {}
 
 
 class ServerCmdProcessor:
+
     def __init__(self, clock_sn):
         self.sn = clock_sn
         self.cmd_id = 0
         self.last_update_students = 0
         self.last_tick = 0
+        self.updating_users = False
+
+    def is_updating_users(self):
+        return self.updating_users
+
+    def parse_one_user(self, user):
+        is_need_update = False
+        old_user = db.get_student(self.sn, user['PIN'])
+        if old_user is None:
+            is_need_update = True
+        else:
+            if user['fingers'] is not None:
+                for finger in user['fingers']:
+                    old_finger = db.get_student_finger(self.sn, user['PIN'], finger['FID'], finger['Size'])
+                    if old_finger is None:
+                        is_need_update = True
+            # print('parse_student_data check finger: ', is_need_update)
+            if user['Card'] is not None:
+                if old_user['Card'] != user['Card'] and not is_need_update:
+                    is_need_update = True
+        # print(user['Name'] + ':' + user['PIN'] + ' is_need_update ', is_need_update)
+        if is_need_update:
+            db.update_student(self.sn, user)
+            # print(user['Name']+':'+user['PIN']+' has been updated!!')
+            ClockCmdGenerator.update_user_info(self.sn, user)
+            if user['fingers'] is not None:
+                for finger in user['fingers']:
+                    finger['PIN'] = user['PIN']
+                    # print('update user finger:' + user['PIN'] + ',' + 'FID=' + str(finger['FID']) + 'Size:' + str(finger['Size']))
+                    ClockCmdGenerator.update_fp_info(self.sn, finger)
 
     def parse_student_data(self, response):
         # print(response)
         self.last_update_students = response['timeStamp']
+        page = int(response['page'])
+        total_pages = int(int(response['count'])/20) + (1 if (int(response['count']) % 20) else 0)
+
         if response['users'] is not None:
             for user in response['users']:
-                is_need_update = False
-                old_user = db.get_student(self.sn, user['PIN'])
-                if old_user is None:
-                    is_need_update = True
-                else:
-                    if user['fingers'] is not None:
-                        for finger in user['fingers']:
-                            old_finger = db.get_student_finger(self.sn, user['PIN'], finger['FID'], finger['Size'])
-                            if old_finger is None:
-                                is_need_update = True
-                    # print('parse_student_data check finger: ', is_need_update)
-                    if user['Card'] is not None:
-                        if old_user['Card'] != user['Card'] and not is_need_update:
-                            is_need_update = True
-                # print(user['Name'] + ':' + user['PIN'] + ' is_need_update ', is_need_update)
-                if is_need_update:
-                    db.update_student(self.sn, user)
-                    # print(user['Name']+':'+user['PIN']+' has been updated!!')
-                    ClockCmdGenerator.update_user_info(self.sn, user)
-                    if user['fingers'] is not None:
-                        for finger in user['fingers']:
-                            finger['PIN'] = user['PIN']
-                            ClockCmdGenerator.update_fp_info(self.sn, finger)
-        info_log(self.sn, '获取服务器端最新用户数据，完成！')
+                self.parse_one_user(user)
+        info_log(self.sn, '获取服务器端最新用户数据('+response['count']+')，第'+response['page']+'页已完成！')
+        if page < total_pages:
+            page += 1
+            ServerApi.get_all_students(self.sn, page, self.last_update_students, self.parse_student_data)
+        else:
+            self.updating_users = False
 
     def get_students(self, options):
+        self.updating_users = True
         if db.get_students_number(self.sn) > int(3100):  # 考勤机最大的指纹用户数量为3200
             db.remove_all_students(self.sn)
             warning_log(self.sn, '考勤机用户数量>3100, max is 3200, 清除树莓派上的用户数据，重新下载用户数据！！')
-        ServerApi.get_all_students(self.sn, self.last_update_students, self.parse_student_data)
+        ServerApi.get_all_students(self.sn, 1, self.last_update_students, self.parse_student_data)
 
     def send_error_logs_response(self, response):
-        info_log(self.sn, '上传ErrorLog，完成！')
+        # info_log(self.sn, '上传ErrorLog，完成！')
+        pass
 
     def send_error_logs(self, options):
         logs_obj = db.get_all_error_logs(self.sn)
@@ -61,16 +80,18 @@ class ServerCmdProcessor:
         for log in logs_obj:
             log['sn'] = self.sn
             logs.append(log)
+            ServerApi.send_error_log(self.sn, [log], self.send_error_logs_response)
         if len(logs) > 0:
-            ServerApi.send_error_log(self.sn, logs, self.send_error_logs_response)
+            # ServerApi.send_error_log(self.sn, logs, self.send_error_logs_response)
             db.del_all_error_logs(self.sn)
         logs = []
         logs_obj = db.get_all_error_logs(SystemSettings['GeneralSetting']['raspyNumSerialNum'])
         for log in logs_obj:
             log['sn'] = SystemSettings['GeneralSetting']['raspyNumSerialNum']
             logs.append(log)
+            ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], [log], None)
         if len(logs) > 0:
-            ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], logs, None)
+            # ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], logs, None)
             db.del_all_error_logs(SystemSettings['GeneralSetting']['raspyNumSerialNum'])
 
     def let_clock_sync_log(self, options):

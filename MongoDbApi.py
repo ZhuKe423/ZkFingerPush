@@ -61,7 +61,6 @@ def mongodb_find_one(func):
     @wraps(func)
     def decorated(*args, **kwargs):
         handle = func(*args, **kwargs)
-        print('mongodb_find_one:', handle)
         if handle['collection'] in zkpush_db.collection_names(include_system_collections=False):
             this_query = handle['query']
             if 'fields' in handle:
@@ -328,6 +327,7 @@ def remove_all_students(clock_sn):
 @mongodb_insert_one
 def add_cmd_line(clock_sn, cmd_id, cmd_line):
     # ClockCmdLine: sn, cmdId, state(0:成功,100:已发送，9999:新加), cmdLine
+    # print('db:', cmd_line[0:80])
     handle = {
         'collection': 'ClockCmdLine',
         'value': {'sn': clock_sn, 'cmdId': cmd_id, 'state': 9999, 'cmdLine': cmd_line}

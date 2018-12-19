@@ -114,6 +114,8 @@ class IClockHandle:
         self.check_send_clock_info(kick_time)
 
     def sync_clock_users(self):
+        if self.server_processor.is_updating_users():
+            return
         info = db.get_clock_info(self.sn)
         if info is None:
             return

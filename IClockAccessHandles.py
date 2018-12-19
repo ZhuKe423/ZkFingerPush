@@ -78,7 +78,7 @@ class GetrequestHandler(RequestHandler):
         cmdlines = dispatch_commands(command)
 
         for cmdline in cmdlines:
-            # print('GetrequestHandler get cmdline:', cmdline)
+            # print('send cmdline:', cmdline[0:80])
             self.write(cmdline)
         # print('GetrequestHandler get out')
 

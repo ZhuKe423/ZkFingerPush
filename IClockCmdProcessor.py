@@ -45,7 +45,7 @@ class IClockCmdProcessor:
         if int(response['Return']) != 0:
             cmd = db.get_cmd_line(self.sn, int(response['ID']))
             if cmd is not None:
-                error_log(self.sn, 'failed ('+response['Return']+'):'+cmd['cmdLine'])
+                error_log(self.sn, 'failed ('+response['Return']+'):'+cmd['cmdLine'][0:80])
         db.del_cmd_line(self.sn, int(response['ID']))
 
 

@@ -35,12 +35,11 @@ def post_response_callback(func):
 
 
 @post_response_callback
-def get_all_students(clock_sn, last_time=0, callback=None):
+def get_all_students(clock_sn, page=1, last_time=0, callback=None):
     """
     从服务获取最新的学生数据
     """
-    print('get_all_students : in')
-    data = {'token': _TOKEN, 'SN': clock_sn, 'timeStamp': last_time}
+    data = {'token': _TOKEN, 'SN': clock_sn, 'page': page, 'timeStamp': last_time}
     handle = {
         'url': AccessUrl['updateStudent'],
         'callback': callback,
@@ -146,6 +145,7 @@ if __name__ == "__main__":
         print(response)
 
     def response_new_record(response):
+        print('response_new_record:')
         print(response)
 
     def send_clock_info(clock_sn):
@@ -162,19 +162,20 @@ if __name__ == "__main__":
         for log in logs_obj:
             log['sn'] = clock_sn
             logs.append(log)
+            send_error_log(clock_sn, [log], None)
         logs_obj = db.get_all_error_logs(SystemSettings['GeneralSetting']['raspyNumSerialNum'])
         for log in logs_obj:
             log['sn'] = SystemSettings['GeneralSetting']['raspyNumSerialNum']
             logs.append(log)
-        send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], logs, None)
+            send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], [log], None)
 
     def parse_server_cmd(response):
         print('parse_server_cmd in:', response)
 
-    get_server_cmd(sn, parse_server_cmd)
-    # send_error_logs(sn)
+    # get_server_cmd(sn, parse_server_cmd)
+    send_error_logs(sn)
     # send_clock_info(sn)
-    # get_all_students(sn, 0, response_print)
+    # get_all_students(sn, 0, 1, response_print)
     # send_new_record(sn, test_record, response_new_record)
     IOLoop.instance().start()
 
