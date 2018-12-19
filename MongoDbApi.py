@@ -61,6 +61,7 @@ def mongodb_find_one(func):
     @wraps(func)
     def decorated(*args, **kwargs):
         handle = func(*args, **kwargs)
+        print('mongodb_find_one:', handle)
         if handle['collection'] in zkpush_db.collection_names(include_system_collections=False):
             this_query = handle['query']
             if 'fields' in handle:
@@ -363,6 +364,7 @@ def get_cmd_line(clock_sn, cmd_id):
         'query': {'sn': clock_sn, 'cmdId': cmd_id},
         'fields': {'_id': 0},
     }
+    return handle
 
 
 @mongodb_del_one

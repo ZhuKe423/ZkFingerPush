@@ -21,7 +21,7 @@ class IClockCmdProcessor:
         return self.cmdId
 
     def update_clock_basic_info(self, info):
-        print('update_clock_basic_info in:', info)
+        # print('update_clock_basic_info in:', info)
         db.update_clock_info(self.sn, info)
         return
 

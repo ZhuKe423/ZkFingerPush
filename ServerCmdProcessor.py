@@ -17,7 +17,7 @@ class ServerCmdProcessor:
         self.last_tick = 0
 
     def parse_student_data(self, response):
-        print(response)
+        # print(response)
         self.last_update_students = response['timeStamp']
         if response['users'] is not None:
             for user in response['users']:
@@ -31,14 +31,14 @@ class ServerCmdProcessor:
                             old_finger = db.get_student_finger(self.sn, user['PIN'], finger['FID'], finger['Size'])
                             if old_finger is None:
                                 is_need_update = True
-                    print('parse_student_data check finger: ', is_need_update)
+                    # print('parse_student_data check finger: ', is_need_update)
                     if user['Card'] is not None:
                         if old_user['Card'] != user['Card'] and not is_need_update:
                             is_need_update = True
-                print(user['Name'] + ':' + user['PIN'] + ' is_need_update ', is_need_update)
+                # print(user['Name'] + ':' + user['PIN'] + ' is_need_update ', is_need_update)
                 if is_need_update:
                     db.update_student(self.sn, user)
-                    print(user['Name']+':'+user['PIN']+' has been updated!!')
+                    # print(user['Name']+':'+user['PIN']+' has been updated!!')
                     ClockCmdGenerator.update_user_info(self.sn, user)
                     if user['fingers'] is not None:
                         for finger in user['fingers']:
@@ -81,7 +81,7 @@ class ServerCmdProcessor:
             ClockCmdGenerator.query_history_logs(self.sn, start, end)
         elif len(options) == 37:
             time_items = options.split(',')
-            print('let_clock_sync_log:', time_items)
+            # print('let_clock_sync_log:', time_items)
             ClockCmdGenerator.query_history_logs(self.sn, time_items[0], time_items[1])
 
     def clear_all_users(self, options):
@@ -92,16 +92,21 @@ class ServerCmdProcessor:
         warning_log(self.sn, '清除所有数据！！')
 
     def send_clock_info_response(self, response):
-        print('send_clock_info_response in:', response)
+        # print('send_clock_info_response in:', response)
         info_log(self.sn, '上传考勤机信息，完成！')
 
     def send_clock_info(self, options):
-        print('web send_clock_info in')
+        # print('web send_clock_info in')
         clock_info = {
             'info': db.get_clock_info(self.sn),
             'heartbeat': db.get_heartbeat_setting(self.sn)
         }
         ServerApi.update_clock_info(self.sn, clock_info, self.send_clock_info_response)
+
+    def update_one_user(self, user_info):
+        # print(user_info)
+        pass
+
 
     def parse_server_cmd(self, response):
         """
@@ -115,6 +120,7 @@ class ServerCmdProcessor:
                         'syncAttLog': '',
                         'clearAll'  : '',
                         'getDeviceInfo' : '',
+                        'updateone': dict
                         .....
                     }
                 }
@@ -126,8 +132,9 @@ class ServerCmdProcessor:
             'syncAttLog': self.let_clock_sync_log,
             'clearAll': self.clear_all_users,
             'getDeviceInfo': self.send_clock_info,
+            'updateone': self.update_one_user,
         }
-        print('parse_server_cmd in:', response)
+        # print('parse_server_cmd in:', response)
         if 'cmd_list' in response:
             cmd = response['cmd_list']
             if len(cmd) > 0:
@@ -141,7 +148,7 @@ class ServerCmdProcessor:
         ServerApi.get_server_cmd(self.sn, self.parse_server_cmd)
 
     def send_att_log_response(self, response):
-        print("send_att_log_response in:", response)
+        # print("send_att_log_response in:", response)
         pass
 
     def send_att_log(self, record):

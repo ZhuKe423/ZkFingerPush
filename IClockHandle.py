@@ -52,6 +52,7 @@ class IClockHandle:
             self.options = DefaultClockOptions
             db.update_clock_options(clock_sn, DefaultClockOptions)
         self.heart_beat = db.get_heartbeat_setting(clock_sn)
+        # print(self.heart_beat)
         if self.heart_beat is None:
             self.heart_beat = DefaultHeartBeatSetting
             self.heart_beat['syncAttLogTime'] += random.randrange(0, 600, 17)
@@ -64,7 +65,7 @@ class IClockHandle:
 
     def check_server_cmd(self, kick_time):
         if (kick_time - self.heart_beat['lastServerCmd']) > self.heart_beat['getServerCmdInterval']:
-            print('check_server_cmd !')
+            # print('check_server_cmd !')
             self.server_processor.get_server_cmd()
             self.heart_beat['lastServerCmd'] = kick_time
 
@@ -76,7 +77,7 @@ class IClockHandle:
     def check_sync_log(self, kick_time):
         sync_time = kick_time - kick_time % 86400 + time.timezone + self.heart_beat['syncAttLogTime']
         if (kick_time > sync_time) and (self.heart_beat['lastSyncLog'] < sync_time):
-            print('check_sync_log !')
+            # print('check_sync_log !')
             self.heart_beat['lastSyncLog'] = kick_time
             CmdGenerator.new_logs(self.sn)
             info_log(self.sn, '考勤机(' + self.sn + ') do check_sync_log()！！')
@@ -84,7 +85,7 @@ class IClockHandle:
 
     def check_clock_los(self, kick_time):
         if (kick_time - self.heart_beat['lastKick']) > self.heart_beat['maxDevLosTime']:
-            print('check_clock_los !')
+            # print('check_clock_los !')
             CmdGenerator.new_logs(self.sn)
             self.server_processor.get_students(None)
             start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self.heart_beat['lastKick']))
@@ -96,7 +97,7 @@ class IClockHandle:
 
     def check_update_students(self, kick_time):
         if (kick_time - self.heart_beat['lastSyncUser']) > self.heart_beat['syncStudentInterval']:
-            print('check_update_students !')
+            # print('check_update_students !')
             self.server_processor.get_students(None)
             self.heart_beat['lastSyncUser'] = kick_time
             info_log(self.sn, '考勤机(' + self.sn + ') 定时同步用户数据！！check_update_students()')
