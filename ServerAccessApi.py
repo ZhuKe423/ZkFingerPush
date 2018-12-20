@@ -6,6 +6,7 @@ import urllib
 import json
 from config import SystemSettings
 from functools import wraps
+from LocalTrace import LTraceInfo, LTraceWarn
 
 AccessUrl = SystemSettings['CloudServerUrl']
 _TOKEN = SystemSettings['GeneralSetting']['clientToken']
@@ -19,17 +20,17 @@ def post_response_callback(func):
         post_data = urllib.parse.urlencode(handle['data']).encode('utf-8')
         request = HTTPRequest(url=handle['url'], method='POST', body=post_data, follow_redirects=False,
                               connect_timeout=200, request_timeout=600)
-        print(func.__name__ + ":url->", handle['url'])
+        LTraceInfo(func.__name__ + ":url->"+handle['url'])
 
         def response_handle(response):
             if response.error:
-                print(func.__name__+":error->", response.error)
+                LTraceWarn(func.__name__+":error->{0}".format(response.error))
             else:
                 # print(response.body)
                 decode_data = json.loads(response.body.decode('utf-8'))
                 if handle['callback'] is not None:
                         handle['callback'](decode_data)
-                        print(handle['callback'].__name__ + ":success！！")
+                        LTraceInfo(handle['callback'].__name__ + ":success！！")
         http_client.fetch(request, response_handle)
     return decorated
 
@@ -173,7 +174,7 @@ if __name__ == "__main__":
         print('parse_server_cmd in:', response)
 
     # get_server_cmd(sn, parse_server_cmd)
-    send_error_logs(sn)
+    # send_error_logs(sn)
     # send_clock_info(sn)
     # get_all_students(sn, 0, 1, response_print)
     # send_new_record(sn, test_record, response_new_record)

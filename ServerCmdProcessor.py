@@ -5,6 +5,7 @@ import IClockCmdGenerator as ClockCmdGenerator
 import MongoDbApi as db
 from config import SystemSettings
 from MongoDbApi import info_log, warning_log
+from LocalTrace import LTraceDebug, LTraceInfo, LTraceWarn
 
 ServerProcessor = {}
 
@@ -32,23 +33,23 @@ class ServerCmdProcessor:
                     old_finger = db.get_student_finger(self.sn, user['PIN'], finger['FID'], finger['Size'])
                     if old_finger is None:
                         is_need_update = True
-            # print('parse_student_data check finger: ', is_need_update)
+            LTraceDebug('parse_student_data check finger: {0}'.format(is_need_update))
             if user['Card'] is not None:
                 if old_user['Card'] != user['Card'] and not is_need_update:
                     is_need_update = True
-        # print(user['Name'] + ':' + user['PIN'] + ' is_need_update ', is_need_update)
+        LTraceDebug(user['Name'] + ':' + user['PIN'] + ' is_need_update = {0}'.format(is_need_update))
         if is_need_update:
             db.update_student(self.sn, user)
-            # print(user['Name']+':'+user['PIN']+' has been updated!!')
+            LTraceDebug(user['Name']+':'+user['PIN']+' has been updated!!')
             ClockCmdGenerator.update_user_info(self.sn, user)
             if user['fingers'] is not None:
                 for finger in user['fingers']:
                     finger['PIN'] = user['PIN']
-                    # print('update user finger:' + user['PIN'] + ',' + 'FID=' + str(finger['FID']) + 'Size:' + str(finger['Size']))
+                    LTraceDebug('update user finger:' + user['PIN'] + ',' + 'FID=' + str(finger['FID']) + 'Size:' + str(finger['Size']))
                     ClockCmdGenerator.update_fp_info(self.sn, finger)
 
     def parse_student_data(self, response):
-        # print(response)
+        LTraceDebug(response)
         self.last_update_students = response['timeStamp']
         page = int(response['page'])
         total_pages = int(int(response['count'])/20) + (1 if (int(response['count']) % 20) else 0)
@@ -56,11 +57,12 @@ class ServerCmdProcessor:
         if response['users'] is not None:
             for user in response['users']:
                 self.parse_one_user(user)
-        info_log(self.sn, '获取服务器端最新用户数据('+response['count']+')，第'+response['page']+'页已完成！')
+            LTraceDebug(self.sn + '获取服务器端最新用户数据(' + response['count'] + ')，第' + response['page'] + '页已完成！')
         if page < total_pages:
             page += 1
             ServerApi.get_all_students(self.sn, page, self.last_update_students, self.parse_student_data)
         else:
+            info_log(self.sn, '获取服务器端最新用户数据(' + response['count'] + ')，共' + response['page'] + '页已完成！')
             self.updating_users = False
 
     def get_students(self, options):
@@ -80,22 +82,22 @@ class ServerCmdProcessor:
         for log in logs_obj:
             log['sn'] = self.sn
             logs.append(log)
-            ServerApi.send_error_log(self.sn, [log], self.send_error_logs_response)
+            # ServerApi.send_error_log(self.sn, [log], self.send_error_logs_response)
         if len(logs) > 0:
-            # ServerApi.send_error_log(self.sn, logs, self.send_error_logs_response)
+            ServerApi.send_error_log(self.sn, logs, self.send_error_logs_response)
             db.del_all_error_logs(self.sn)
         logs = []
         logs_obj = db.get_all_error_logs(SystemSettings['GeneralSetting']['raspyNumSerialNum'])
         for log in logs_obj:
             log['sn'] = SystemSettings['GeneralSetting']['raspyNumSerialNum']
             logs.append(log)
-            ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], [log], None)
+            # ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], [log], None)
         if len(logs) > 0:
-            # ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], logs, None)
+            ServerApi.send_error_log(SystemSettings['GeneralSetting']['raspyNumSerialNum'], logs, None)
             db.del_all_error_logs(SystemSettings['GeneralSetting']['raspyNumSerialNum'])
 
     def let_clock_sync_log(self, options):
-        # print('let_clock_sync_log option len:', len(options))
+        LTraceInfo('let_clock_sync_log option len:{0}'.format(len(options)))
         if options == '':
             start = time.strftime("%Y-%m-%d 00:00:01", time.localtime())
             end = time.strftime("%Y-%m-%d 23:59:59", time.localtime())
@@ -109,15 +111,15 @@ class ServerCmdProcessor:
         db.del_all_cmd_lines(self.sn)
         db.remove_all_students(self.sn)
         ClockCmdGenerator.clear_all_data(self.sn)
-        self.get_error_logs(None)
         warning_log(self.sn, '清除所有数据！！')
+        self.send_error_logs(None)
 
     def send_clock_info_response(self, response):
-        # print('send_clock_info_response in:', response)
+        LTraceInfo('send_clock_info_response in: '.format(response))
         info_log(self.sn, '上传考勤机信息，完成！')
 
     def send_clock_info(self, options):
-        # print('web send_clock_info in')
+        LTraceInfo('web send_clock_info in')
         clock_info = {
             'info': db.get_clock_info(self.sn),
             'heartbeat': db.get_heartbeat_setting(self.sn)
@@ -125,9 +127,10 @@ class ServerCmdProcessor:
         ServerApi.update_clock_info(self.sn, clock_info, self.send_clock_info_response)
 
     def update_one_user(self, user_info):
-        # print(user_info)
+        LTraceInfo('update_one_user:')
+        LTraceDebug(user_info)
+        self.parse_one_user(user_info['user'])
         pass
-
 
     def parse_server_cmd(self, response):
         """
@@ -155,7 +158,7 @@ class ServerCmdProcessor:
             'getDeviceInfo': self.send_clock_info,
             'updateone': self.update_one_user,
         }
-        # print('parse_server_cmd in:', response)
+        LTraceInfo('parse_server_cmd in: {0}'.format(response))
         if 'cmd_list' in response:
             cmd = response['cmd_list']
             if len(cmd) > 0:
@@ -169,7 +172,7 @@ class ServerCmdProcessor:
         ServerApi.get_server_cmd(self.sn, self.parse_server_cmd)
 
     def send_att_log_response(self, response):
-        # print("send_att_log_response in:", response)
+        LTraceInfo("send_att_log_response in: {0}".format(response))
         pass
 
     def send_att_log(self, record):

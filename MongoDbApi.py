@@ -3,6 +3,7 @@ import time
 from pymongo import MongoClient
 from functools import wraps
 from config import SystemSettings
+from LocalTrace import LTraceDebug
 
 MongoDBClient = None
 zkpush_db = None
@@ -327,7 +328,7 @@ def remove_all_students(clock_sn):
 @mongodb_insert_one
 def add_cmd_line(clock_sn, cmd_id, cmd_line):
     # ClockCmdLine: sn, cmdId, state(0:成功,100:已发送，9999:新加), cmdLine
-    # print('db:', cmd_line[0:80])
+    LTraceDebug('db: {0}'.format(cmd_line[0:80]))
     handle = {
         'collection': 'ClockCmdLine',
         'value': {'sn': clock_sn, 'cmdId': cmd_id, 'state': 9999, 'cmdLine': cmd_line}
@@ -356,6 +357,16 @@ def get_new_cmd_lines(clock_sn, limit=20):
     }
     return handle
 
+@mongodb_find
+def get_all_cmd_lines(clock_sn, limit=20):
+    handle = {
+        'collection': 'ClockCmdLine',
+        'query': {'sn': clock_sn},
+        'fields': {'_id': 0},
+        'sort': {'key': 'cmdId', 'value': 1},
+        'limit': limit
+    }
+    return handle
 
 @mongodb_find_one
 def get_cmd_line(clock_sn, cmd_id):

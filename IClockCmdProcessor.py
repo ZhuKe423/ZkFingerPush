@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import MongoDbApi as db
 from MongoDbApi import error_log
-import  threading
+import threading
+from LocalTrace import LTraceDebug
+
 CMD_IS_SUCCESS = 0
 CMD_IS_SEND = 100
 CMD_IS_NEW = 9999
@@ -21,7 +23,7 @@ class IClockCmdProcessor:
         return self.cmdId
 
     def update_clock_basic_info(self, info):
-        # print('update_clock_basic_info in:', info)
+        LTraceDebug('update_clock_basic_info in: {0}'.format(info))
         db.update_clock_info(self.sn, info)
         return
 
@@ -39,7 +41,7 @@ class IClockCmdProcessor:
             'INFO': self.update_clock_basic_info,
             # 'DATA':
         }
-        # print('cmd_return_dispatch in', response)
+        LTraceDebug('cmd_return_dispatch in {0}'.format(response))
         if response['CMD'] in dispatch_table:
             dispatch_table[response['CMD']](response['data'])
         if int(response['Return']) != 0:

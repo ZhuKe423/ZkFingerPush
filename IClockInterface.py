@@ -4,7 +4,7 @@ from IClockCmdProcessor import clock_cmd_processor
 from IClockHandle import clock_handle
 from ServerCmdProcessor import server_processor
 import IClockCmdGenerator as CmdGenerator
-# import MongoDbApi as db
+from LocalTrace import LTraceDebug
 
 
 def debug_decorate(func):
@@ -112,7 +112,7 @@ def add_clock_attendance_log(clock_sn, command, content=None):
     records = parse_attendance_table_parameters(content)
     for record in records:
         server_processor(clock_sn).send_att_log(record)
-    # print(records)
+    LTraceDebug(records)
     return ['OK']
 
 
@@ -124,7 +124,7 @@ def update_clock_information(clock_sn, command, content=None):
                     INFO=固件版本号,登记用户数,登记指纹数,考勤记录数,考勤机IP 地址，指纹算法版本
     :return:
     """
-    # print("update_clock_information "+clock_sn)
+    LTraceDebug("update_clock_information "+clock_sn)
     tmp = command['INFO'].split(',')
     info = {
         'FWVersion': tmp[0],
@@ -134,23 +134,23 @@ def update_clock_information(clock_sn, command, content=None):
         'IPAddress': tmp[4],
         'FPVersion': tmp[5]
     }
-    # print('update_clock_information info:', info)
+    LTraceDebug('update_clock_information info: {0}'.format(info))
     clock_cmd_processor(clock_sn).update_clock_basic_info(info)
     return []
 
 
 def cmd_info_response(clock_sn, command, content):
-    # print('cmd_info_response ' + str(command))
+    LTraceDebug('cmd_info_response ' + str(command))
     return []
 
 
 def cmd_check_response(clock_sn, command, content):
-    # print('cmd_check_response ' + str(command))
+    LTraceDebug('cmd_check_response ' + str(command))
     return []
 
 
 def heart_beat_process(clock_sn, command, content):
-    # print('heart_beat_process ' + str(command))
+    LTraceDebug('heart_beat_process ' + str(command))
     clock_handle(clock_sn).kick_ass()
     cmd_line = clock_cmd_processor(clock_sn).cmd_lines_need_to_send()
     if cmd_line is None:
@@ -171,7 +171,7 @@ def parse_cmd_return_data(content):
     """
     def get_command(cmd_content):
         cmd_items = cmd_content.split('&')
-        # print(cmd_items)
+        LTraceDebug(cmd_items)
         cmd_data = {}
         for cmd_item in cmd_items:
             if cmd_item != '':
@@ -184,7 +184,7 @@ def parse_cmd_return_data(content):
         for item in data_items:
             if item != '':
                 tmp = item.split('=')
-                # print('get_command_data tmp:'+str(tmp))
+                # LTraceDebug('get_command_data tmp:'+str(tmp))
                 data[tmp[0]] = tmp[1]
         return data
     if content is None:
@@ -208,10 +208,10 @@ def parse_cmd_return_data(content):
 
 
 def cmd_return_response(clock_sn, command, content):
-    # print('cmd_return_response ' + str(command))
-    # print('cmd_return_response content:' + content)
+    LTraceDebug('cmd_return_response ' + str(command))
+    LTraceDebug('cmd_return_response content:' + content)
     cmd_response = parse_cmd_return_data(content)
-    # print(str(cmd_response))
+    LTraceDebug(str(cmd_response))
     if type(cmd_response).__name__ != 'list':
         clock_cmd_processor(clock_sn).cmd_return_dispatch(cmd_response)
     else:

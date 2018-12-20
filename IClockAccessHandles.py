@@ -1,14 +1,15 @@
 
 from tornado.web import RequestHandler
 from IClockInterface import IClockInterfaceList
+from LocalTrace import LTraceDebug, LTraceWarn
 
 
 def dispatch_commands(command, content=None):
-    # print(command)
+    LTraceDebug(command)
     feedbacks = []
     for (k, v) in command.items():
         if k in IClockInterfaceList:
-            # print(type(IClockInterfaceList[k]).__name__)
+            LTraceDebug(type(IClockInterfaceList[k]).__name__)
             if type(IClockInterfaceList[k]).__name__ == 'dict':
                 if v in IClockInterfaceList[k]:
                     feedbacks += IClockInterfaceList[k][v](command['SN'], command, content)
@@ -21,39 +22,39 @@ def dispatch_commands(command, content=None):
 class CdataHandler(RequestHandler):
 
     def get(self, input):
-        # print('CdataHandler get in')
+        LTraceDebug('CdataHandler get in')
         args = self.request.arguments
         command = {}
         for a in args:
             command[a] = self.get_argument(a)
         if 'SN' not in command:
-            # print('This Clock Accessing without SN number!!!')
+            LTraceWarn('This Clock Accessing without SN number!!!')
             return
         cmdlines = dispatch_commands(command)
-        # print('CdataHandler get cmdlines:' + str(cmdlines))
         for cmdline in cmdlines:
             self.write(cmdline)
-        # print('CdataHandler get out')
+            LTraceDebug('CdataHandler CmdLine: {0}'.format(cmdline[0:80]))
+        LTraceDebug('CdataHandler get out')
 
     def post(self, post):
         """
         :param post: This parameter is always none
         :return:
         """
-        # print('CdataHandler post in')
+        LTraceDebug('CdataHandler post in')
         content = str(self.request.body, encoding="gbk")
         args = self.request.arguments
         command = {}
         for a in args:
             command[a] = self.get_argument(a)
         if 'SN' not in command:
-            # print('This Clock Accessing without SN number!!!')
+            LTraceWarn('This Clock Accessing without SN number!!!')
             return
         cmdlines = dispatch_commands(command, content)
-        # print('CdataHandler post cmdlines:' + str(cmdlines))
         for cmdline in cmdlines:
             self.write(cmdline)
-        # print('CdataHandler post out')
+            LTraceDebug('CdataHandlerPost CmdLine: {0}'.format(cmdline[0:80]))
+        LTraceDebug('CdataHandler post out')
 
 
 class GetrequestHandler(RequestHandler):
@@ -62,25 +63,24 @@ class GetrequestHandler(RequestHandler):
         :param input: this parameter always None
         :return:
         """
-        # print('GetrequestHandler get in')
+        LTraceDebug('GetrequestHandler get in')
         # content = str(self.request.body, encoding="gbk")
         args = self.request.arguments
         command = {}
         for a in args:
             command[a] = self.get_argument(a)
-        # print('GetrequestHandler command:', str(command))
+        LTraceDebug('GetrequestHandler command:'+str(command))
         if 'SN' not in command:
-            print('This Clock Accessing without SN number!!!')
+            LTraceWarn('This Clock Accessing without SN number!!!')
             return
         if len(command) == 1:
             command['HeartBeat'] = 'Clock Heart Beat'
-        # print('GetrequestHandler get content', content)
         cmdlines = dispatch_commands(command)
 
         for cmdline in cmdlines:
-            # print('send cmdline:', cmdline[0:80])
+            LTraceDebug('send cmdline: {0}'.format(cmdline[0:80]))
             self.write(cmdline)
-        # print('GetrequestHandler get out')
+        LTraceDebug('GetrequestHandler get out')
 
 
 class DeviceCmdHandler(RequestHandler):
@@ -89,19 +89,18 @@ class DeviceCmdHandler(RequestHandler):
         :param post: This parameter is always none
         :return:
         """
-        # print('DeviceCmdHandler post in')
+        LTraceDebug('DeviceCmdHandler post in')
         content = str(self.request.body, encoding="gbk")
         args = self.request.arguments
         command = {}
         for a in args:
             command[a] = self.get_argument(a)
         if 'SN' not in command:
-            # print('This Clock Accessing without SN number!!!')
+            LTraceWarn('This Clock Accessing without SN number!!!')
             return
         if len(command) == 1:
             command['CmdResp'] = 'Clock Command Response'
         cmdlines = dispatch_commands(command, content)
-        # print('DeviceCmdHandler post cmdlines:' + str(cmdlines))
         for cmdline in cmdlines:
             self.write(cmdline)
-        # print('DeviceCmdHandler post out')
+        LTraceDebug('DeviceCmdHandler post out')

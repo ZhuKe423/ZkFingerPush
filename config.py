@@ -16,6 +16,6 @@ SystemSettings = {
         'syncStudentInterval': 1 * 60 * 60,  # 1 hour
         'syncAttLogTime': 23 * 60 * 60,      # 23:00:00
         'maxDevLosTime': 12 * 60 * 60,       # 12 hours
-        'getServerCmdInterval': 2 * 60      # 10 min
+        'getServerCmdInterval': 1 * 60      # 10 min
     }
 }
