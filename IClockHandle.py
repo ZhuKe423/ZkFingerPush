@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import time
+import time, copy
 import random
 from config import SystemSettings
 from IClockCmdProcessor import clock_cmd_processor
@@ -50,12 +50,12 @@ class IClockHandle:
         self.server_processor = server_processor(clock_sn)
         self.options = db.get_clock_options(clock_sn)
         if self.options is None:
-            self.options = DefaultClockOptions
+            self.options = copy.deepcopy(DefaultClockOptions)
             db.update_clock_options(clock_sn, DefaultClockOptions)
         self.heart_beat = db.get_heartbeat_setting(clock_sn)
         LTraceDebug(self.heart_beat)
         if self.heart_beat is None:
-            self.heart_beat = DefaultHeartBeatSetting
+            self.heart_beat = copy.deepcopy(DefaultHeartBeatSetting)
             self.heart_beat['syncAttLogTime'] += random.randrange(0, 600, 17)
             db.update_heartbeat_setting(clock_sn, DefaultHeartBeatSetting)
         info_log(self.sn, '考勤机('+self.sn+')上线！！')
