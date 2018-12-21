@@ -35,6 +35,8 @@ def mongodb_update_one(func):
         handle = func(*args, **kwargs)
         if handle['collection'] in zkpush_db.collection_names(include_system_collections=False):
             this_query = handle['query']
+            if '_id' in handle['value']:
+                del handle['value']['_id']
             new_value = {'$set': handle['value']}
             return zkpush_db[handle['collection']].update(this_query, new_value, True, False)
         else:

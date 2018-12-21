@@ -129,4 +129,4 @@ Get Command data_response :
 2. pip3 install pycurl
 3. pip3 install tornado
 4. apt-get install MongoDB
-5. pip3 install pymongo
+5. pip3 install pymongo==3.2
