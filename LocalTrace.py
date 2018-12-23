@@ -5,7 +5,7 @@ from logging.handlers import RotatingFileHandler
 import os.path
 import time
 
-LTrace = logging.getLogger()
+LTrace = logging.getLogger("tornado.access")
 '''
 LTraceDebug = None
 LTraceInfo = None
@@ -32,7 +32,7 @@ def init_local_trace():
     LTrace.addHandler(fh)
     '''
     console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
+    console.setLevel(logging.FATAL)
     console.setFormatter(formatter)
     LTrace.addHandler(console)
     '''
@@ -44,6 +44,7 @@ def init_local_trace():
     LTraceInfo = LTrace.info
     LTraceWarn = LTrace.warning
     LTraceError = LTrace.error
+    logging.getLogger("tornado.access").propagate = False
     LTraceInfo('init_local_trace is done!!')
 
 

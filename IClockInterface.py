@@ -69,7 +69,7 @@ def add_clock_operate_log(clock_sn, command, content=None):
     if content is None:
         return None
     operations = parse_operate_table_parameters(content)
-    print('add_clock_operate_log operation:', operations)
+    # print('add_clock_operate_log operation:', operations)
     feedback = ['OK']
     return feedback
 

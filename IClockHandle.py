@@ -144,8 +144,9 @@ class IClockHandle:
                         for finger in user['fingers']:
                             finger['PIN'] = user['PIN']
                             CmdGenerator.update_fp_info(self.sn, finger)
-                    warning_log(self.sn, '考勤机(' + self.sn + ')用户数量与树莓派用户数量不一致,重新同步！！')
-                    LTraceInfo('考勤机(' + self.sn + ')用户数量与树莓派用户数量不一致,重新同步！！')
+
+                warning_log(self.sn, '考勤机(' + self.sn + ')用户数量与树莓派用户数量不一致,重新同步！！')
+                LTraceInfo('考勤机(' + self.sn + ')用户数量与树莓派用户数量不一致,重新同步！！')
 
 
 def clock_handle(clock_sn, is_create=True):
