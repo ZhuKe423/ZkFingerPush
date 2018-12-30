@@ -18,7 +18,7 @@ DefaultClockOptions = {
         'OpStamp'       : '9238883',
         'PhotoStamp'    : '9238833',
         'ErrorDelay'    : '60',
-        'Delay'         : '10',
+        'Delay'         : '20',
         'TransTimes'    : '00:00;14:05',
         'TransInterval' : '1',
         'TransFlag'     : '1111000000',

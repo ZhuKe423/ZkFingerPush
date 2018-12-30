@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     app = tornado.web.Application(
         handlers=[
-            (r"/iclock/cdata?(.*)",CdataHandler),
+            (r"/iclock/cdata?(.*)", CdataHandler),
             (r"/iclock/getrequest?(.*)", GetrequestHandler),
             (r"/iclock/devicecmd?(.*)", DeviceCmdHandler)
         ]

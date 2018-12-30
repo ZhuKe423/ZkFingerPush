@@ -58,7 +58,7 @@ def update_user_info(clock_sn, info):
     cmd_id = clock_cmd_processor(clock_sn).inc_cmd_id()
     cmd_line = format("C:%04d:%s PIN=%s\tName=%s\tPri=%s\tCard=%s\n" %
                       (cmd_id, CMD_UPDATE_DEV_USER, str(info['PIN']), info['Name'], info['Pri'],
-                       info['Card'])).encode('gbk')
+                       info['Card'])).encode('gbk', 'ignore')
     db.add_cmd_line(clock_sn, cmd_id, cmd_line)
 
 

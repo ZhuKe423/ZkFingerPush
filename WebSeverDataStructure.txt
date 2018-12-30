@@ -124,9 +124,11 @@ Get Command data_response :
 
 
 树莓派3 环境安装：
+sudo apt-get update
+sudo apt-get upgrade
 sudo apt-get install python3-pip python3-dev
 sudo apt-get install mongodb
-sudo apt-get install libcurl-dev
-2. sudo pip3 install pycurl
-3. sudo pip3 install tornado
-5. sudo pip3 install pymongo==3.2
+sudo apt-get install libcurl4-openssl-dev
+sudo pip3 install pycurl
+sudo pip3 install tornado
+sudo pip3 install pymongo==3.2

@@ -37,6 +37,8 @@ class ServerCmdProcessor:
             if user['Card'] is not None:
                 if old_user['Card'] != user['Card'] and not is_need_update:
                     is_need_update = True
+            if (user['Pri'] != old_user['Pri']) and not is_need_update:
+                is_need_update = True
         LTraceDebug(user['Name'] + ':' + user['PIN'] + ' is_need_update = {0}'.format(is_need_update))
         if is_need_update:
             db.update_student(self.sn, user)
