@@ -20,7 +20,7 @@ LTraceError = LTrace.error
 
 def init_local_trace():
     global LTrace
-    LTrace.setLevel(logging.INFO)
+    LTrace.setLevel(logging.DEBUG)
     log_path = os.getcwd() + '/Logs/'
     log_name = log_path + 'zkpush.log'
     logfile = log_name

@@ -180,6 +180,14 @@ class ServerCmdProcessor:
     def send_att_log(self, record):
         ServerApi.send_new_record(self.sn, record, self.send_att_log_response)
 
+    def send_new_fp_tmp_response(self, response):
+        LTraceInfo("send_new_fp_tmp_response in: {0}".format(response))
+        pass
+
+    def send_new_fp_tmp(self, data):
+        db.update_student_fp(self.sn, data)
+        ServerApi.send_new_fp_tmp(self.sn, data, self.send_new_fp_tmp_response)
+
 
 def server_processor(clock_sn):
     if clock_sn in ServerProcessor:

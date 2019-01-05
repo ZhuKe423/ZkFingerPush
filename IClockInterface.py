@@ -37,10 +37,10 @@ def parse_operate_table_parameters(content):
     def get_user_data(user_content):
         user_items = user_content.split('\t')
         user_item_data = {}
-        for user_item_data in user_items:
+        for item in user_items:
             if item != '':
-                tmp = user_item_data.split('=')
-                item_data[tmp[0]] = tmp[1]
+                tmp = item.split('=')
+                user_item_data[tmp[0]] = tmp[1]
         return user_item_data
     op_types = {
         # 目前只支持这几种type
@@ -65,11 +65,19 @@ def parse_operate_table_parameters(content):
     return data
 
 
+def process_clock_operation(clock_sn, operation):
+    if operation['OpType'] == 'FP':
+        server_processor(clock_sn).send_new_fp_tmp(operation['data'])
+    return
+
+
 def add_clock_operate_log(clock_sn, command, content=None):
     if content is None:
         return None
     operations = parse_operate_table_parameters(content)
-    # print('add_clock_operate_log operation:', operations)
+    print('add_clock_operate_log operation:', operations)
+    for operation in operations:
+        process_clock_operation(clock_sn, operation)
     feedback = ['OK']
     return feedback
 

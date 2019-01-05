@@ -42,7 +42,9 @@ class CdataHandler(RequestHandler):
         :return:
         """
         LTraceDebug('CdataHandler post in')
+        # print('CdataHandler post in')
         content = str(self.request.body, encoding="gbk")
+        # print(content)
         args = self.request.arguments
         command = {}
         for a in args:
@@ -50,6 +52,7 @@ class CdataHandler(RequestHandler):
         if 'SN' not in command:
             LTraceWarn('This Clock Accessing without SN number!!!')
             return
+        # print(command)
         cmdlines = dispatch_commands(command, content)
         for cmdline in cmdlines:
             self.write(cmdline)

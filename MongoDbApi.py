@@ -282,6 +282,28 @@ def update_student(clock_sn, user):
     return handle
 
 
+def update_student_fp(clock_sn, data):
+    student_info = get_student(clock_sn, data['PIN'])
+    finger_was_updated = False
+    for finger in student_info['fingers']:
+        if finger['FID'] == int(data['FID']):
+            finger['Size'] = data['Size']
+            finger['TMP'] = data['TMP']
+            finger_was_updated = True
+            break
+
+    if finger_was_updated is False:
+        tmp = {
+            'FID': int(data['FID']),
+            'Size': data['Size'],
+            'TMP': data['TMP']
+        }
+        student_info['fingers'].append(tmp)
+
+    print(student_info)
+    return update_student(clock_sn, student_info)
+
+
 def get_students_number(clock_sn):
     return zkpush_db['StudentInfo'].find({'sn': clock_sn}).count()
 
@@ -358,6 +380,7 @@ def get_new_cmd_lines(clock_sn, limit=20):
         'limit': limit
     }
     return handle
+
 
 @mongodb_find
 def get_all_cmd_lines(clock_sn, limit=20):

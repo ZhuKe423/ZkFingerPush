@@ -24,9 +24,10 @@ def post_response_callback(func):
 
         def response_handle(response):
             if response.error:
+                print(response)
                 LTraceWarn(func.__name__+":error->{0}".format(response.error))
             else:
-                # print(response.body)
+                print(response.body)
                 decode_data = json.loads(response.body.decode('utf-8'))
                 if handle['callback'] is not None:
                         handle['callback'](decode_data)
@@ -134,6 +135,17 @@ def update_clock_info(clock_sn, info, callback):
     return handle
 
 
+@post_response_callback
+def send_new_fp_tmp(clock_sn, fp_info, callback=None):
+    data = {'token': _TOKEN, 'SN': clock_sn, 'data': json.dumps(fp_info)}
+    handle = {
+        'url': AccessUrl['updateClockUserFp'],
+        'callback': callback,
+        'data': data
+    }
+    return handle
+
+
 if __name__ == "__main__":
     import tornado.options
     import MongoDbApi as db
@@ -173,10 +185,20 @@ if __name__ == "__main__":
     def parse_server_cmd(response):
         print('parse_server_cmd in:', response)
 
+    def response_new_fp_tmp(response):
+        print('parse_server_cmd in:', response)
+
+    fp_info = {
+        'PIN': '181001',
+        'FID': 5,
+        'Size': 1800,
+        'TMP': 'asdfafer4e4'
+    }
     # get_server_cmd(sn, parse_server_cmd)
     # send_error_logs(sn)
     # send_clock_info(sn)
     # get_all_students(sn, 0, 1, response_print)
     # send_new_record(sn, test_record, response_new_record)
+    send_new_fp_tmp(sn, fp_info, response_new_fp_tmp)
     IOLoop.instance().start()
 

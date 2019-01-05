@@ -8,7 +8,8 @@ SystemSettings = {
         'getStudent': 'http://www.jzk12.com/wx4/w18/WeiXiao/StudentAttendance/getStudent',
         'getCommand': 'http://www.jzk12.com/wx4/w18/WeiXiao/StudentAttendance/getCommand',
         'sendErrorLogs': 'http://www.jzk12.com/wx4/w18/WeiXiao/StudentAttendance/sendErrorLogs',
-        'updateClockInfo': 'http://www.jzk12.com/wx4/w18/WeiXiao/StudentAttendance/updateClockInfo'
+        'updateClockInfo': 'http://www.jzk12.com/wx4/w18/WeiXiao/StudentAttendance/updateClockInfo',
+        'updateClockUserFp': 'http://www.jzk12.com/wx4/w18/WeiXiao/StudentAttendance/updateClockUserFp'
     },
     'GeneralSetting': {
         'raspyNumSerialNum': 'Haha-1',
