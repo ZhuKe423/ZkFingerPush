@@ -300,7 +300,7 @@ def update_student_fp(clock_sn, data):
         }
         student_info['fingers'].append(tmp)
 
-    print(student_info)
+    # print(student_info)
     return update_student(clock_sn, student_info)
 
 

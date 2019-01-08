@@ -24,10 +24,10 @@ def post_response_callback(func):
 
         def response_handle(response):
             if response.error:
-                print(response)
+                # print(response)
                 LTraceWarn(func.__name__+":error->{0}".format(response.error))
             else:
-                print(response.body)
+                # print(response.body)
                 decode_data = json.loads(response.body.decode('utf-8'))
                 if handle['callback'] is not None:
                         handle['callback'](decode_data)
