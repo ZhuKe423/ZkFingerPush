@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import platform
 from logging.handlers import RotatingFileHandler
 import os.path
 import time
@@ -20,8 +21,12 @@ LTraceError = LTrace.error
 
 def init_local_trace():
     global LTrace
-    LTrace.setLevel(logging.DEBUG)
-    log_path = os.getcwd() + '/Logs/'
+    LTrace.setLevel(logging.INFO)
+    system = platform.system()
+    if system == 'Windows':
+        log_path = os.getcwd() + '/Logs/'
+    else:
+        log_path = '/home/pi/ZkFingerPush/Logs/'
     log_name = log_path + 'zkpush.log'
     logfile = log_name
     # each file size is 20M, max files is 10

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import time
+import os, platform
 import ServerAccessApi as ServerApi
 import IClockCmdGenerator as ClockCmdGenerator
 import MongoDbApi as db
@@ -59,12 +60,12 @@ class ServerCmdProcessor:
         if response['users'] is not None:
             for user in response['users']:
                 self.parse_one_user(user)
-            LTraceDebug(self.sn + '获取服务器端最新用户数据(' + response['count'] + ')，第' + response['page'] + '页已完成！')
+            LTraceDebug(self.sn + '获取服务器端最新用户数据(' + response['count'] + ')，第' + str(response['page']) + '页已完成！')
         if page < total_pages:
             page += 1
             ServerApi.get_all_students(self.sn, page, self.last_update_students, self.parse_student_data)
         else:
-            info_log(self.sn, '获取服务器端最新用户数据(' + response['count'] + ')，共' + response['page'] + '页已完成！')
+            info_log(self.sn, '获取服务器端最新用户数据(' + response['count'] + ')，共' + str(response['page']) + '页已完成！')
             self.updating_users = False
 
     def get_students(self, options):
@@ -134,6 +135,16 @@ class ServerCmdProcessor:
         self.parse_one_user(user_info['user'])
         pass
 
+    def execute_system_cmd(self, cmd):
+        LTraceInfo('execute_system_cmd:')
+        LTraceInfo('{0}'.format(cmd))
+        system = platform.system()
+        if system == 'Windows':
+            print(cmd)
+        else:
+            response = os.popen(cmd['cmd']).read()
+            LTraceInfo(response)
+
     def parse_server_cmd(self, response):
         """
         :param response:
@@ -146,7 +157,8 @@ class ServerCmdProcessor:
                         'syncAttLog': '',
                         'clearAll'  : '',
                         'getDeviceInfo' : '',
-                        'updateone': dict
+                        'updateone': dict,
+                        'syscmd': 'cmd'
                         .....
                     }
                 }
@@ -159,6 +171,7 @@ class ServerCmdProcessor:
             'clearAll': self.clear_all_users,
             'getDeviceInfo': self.send_clock_info,
             'updateone': self.update_one_user,
+            'syscmd': self.execute_system_cmd,
         }
         LTraceInfo('parse_server_cmd in: {0}'.format(response))
         if 'cmd_list' in response:
