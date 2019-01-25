@@ -1,10 +1,8 @@
-
-import textwrap
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
 from tornado.options import define, options
-from IClockAccessHandles import CdataHandler, GetrequestHandler, DeviceCmdHandler
+from IClockAccessHandles import CdataHandler, GetrequestHandler, DeviceCmdHandler, UserServer
 from MongoDbApi import initialize_database
 from LocalTrace import init_local_trace
 
@@ -20,7 +18,8 @@ if __name__ == "__main__":
         handlers=[
             (r"/iclock/cdata?(.*)", CdataHandler),
             (r"/iclock/getrequest?(.*)", GetrequestHandler),
-            (r"/iclock/devicecmd?(.*)", DeviceCmdHandler)
+            (r"/iclock/devicecmd?(.*)", DeviceCmdHandler),
+            (r"/UserServer/user?(.*)", UserServer)
         ]
     )
 

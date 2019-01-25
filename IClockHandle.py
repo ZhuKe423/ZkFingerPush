@@ -80,7 +80,7 @@ class IClockHandle:
             self.heart_beat['lastSendInfo'] = kick_time
 
     def check_sync_log(self, kick_time):
-        sync_time = kick_time - kick_time % 86400 + time.timezone + self.heart_beat['syncAttLogTime']
+        sync_time = kick_time - kick_time % 86400 + self.heart_beat['syncAttLogTime']
         if (kick_time > sync_time) and (self.heart_beat['lastSyncLog'] < sync_time):
             LTraceInfo('check_sync_log !')
             self.heart_beat['lastSyncLog'] = kick_time

@@ -20,7 +20,6 @@ def dispatch_commands(command, content=None):
 
 
 class CdataHandler(RequestHandler):
-
     def get(self, input):
         LTraceDebug('CdataHandler get in')
         args = self.request.arguments
@@ -72,7 +71,7 @@ class GetrequestHandler(RequestHandler):
         command = {}
         for a in args:
             command[a] = self.get_argument(a)
-        LTraceDebug('GetrequestHandler command:'+str(command))
+        # print('GetrequestHandler command:'+str(command))
         if 'SN' not in command:
             LTraceWarn('This Clock Accessing without SN number!!!')
             return
@@ -107,3 +106,17 @@ class DeviceCmdHandler(RequestHandler):
         for cmdline in cmdlines:
             self.write(cmdline)
         LTraceDebug('DeviceCmdHandler post out')
+
+
+class UserServer(RequestHandler):
+    def get(self, input):
+        LTraceDebug('UserServer/user get in')
+        # content = str(self.request.body, encoding="gbk")
+        args = self.request.arguments
+        command = {}
+        for a in args:
+            command[a] = self.get_argument(a)
+        # print('UserServer command: {0}'.format(command))
+        content = str(self.request.body, encoding="gbk")
+        # print('content:\n', content)
+        self.write('getserver=192.168.11.20:8002')
