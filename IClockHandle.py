@@ -31,6 +31,7 @@ DefaultClockOptions = {
 
 DefaultHeartBeatSetting = {
     'maxDevLosTime'         : SystemSettings['GeneralSetting']['maxDevLosTime'],
+    'syncStudentTime'       : SystemSettings['GeneralSetting']['syncStudentTime'],
     'syncStudentInterval'   : SystemSettings['GeneralSetting']['syncStudentInterval'],
     'syncAttLogTime'        : SystemSettings['GeneralSetting']['syncAttLogTime'],
     'getServerCmdInterval'  : SystemSettings['GeneralSetting']['getServerCmdInterval'],
@@ -57,6 +58,7 @@ class IClockHandle:
         if self.heart_beat is None:
             self.heart_beat = copy.deepcopy(DefaultHeartBeatSetting)
             self.heart_beat['syncAttLogTime'] += random.randrange(0, 600, 17)
+            self.heart_beat['syncStudentTime'] += random.randrange(0, 3000, 27)
             db.update_heartbeat_setting(clock_sn, DefaultHeartBeatSetting)
         info_log(self.sn, '考勤机('+self.sn+')上线！！')
         LTraceInfo('考勤机('+self.sn+')上线！！')
@@ -80,7 +82,7 @@ class IClockHandle:
             self.heart_beat['lastSendInfo'] = kick_time
 
     def check_sync_log(self, kick_time):
-        sync_time = kick_time - kick_time % 86400 + self.heart_beat['syncAttLogTime']
+        sync_time = kick_time - kick_time % 86400 + time.timezone + self.heart_beat['syncAttLogTime']
         if (kick_time > sync_time) and (self.heart_beat['lastSyncLog'] < sync_time):
             LTraceInfo('check_sync_log !')
             self.heart_beat['lastSyncLog'] = kick_time
@@ -101,7 +103,9 @@ class IClockHandle:
             info_log(self.sn, '考勤机(' + self.sn + ') 恢复连接！！check_clock_los()')
 
     def check_update_students(self, kick_time):
-        if (kick_time - self.heart_beat['lastSyncUser']) > self.heart_beat['syncStudentInterval']:
+        # if (kick_time - self.heart_beat['lastSyncUser']) > self.heart_beat['syncStudentInterval']:
+        sync_time = kick_time - kick_time % 86400 + time.timezone + self.heart_beat['syncStudentTime']
+        if (kick_time > sync_time) and (self.heart_beat['lastSyncUser'] < sync_time):
             LTraceInfo('check_update_students !')
             self.server_processor.get_students(None)
             self.heart_beat['lastSyncUser'] = kick_time

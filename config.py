@@ -14,9 +14,10 @@ SystemSettings = {
     'GeneralSetting': {
         'raspyNumSerialNum': 'Haha-1',
         'clientToken': 'gh_221e39c94190',
+        'syncStudentTime': 21 * 60 * 60,     # 21:00:00
         'syncStudentInterval': 1 * 60 * 60,  # 1 hour
         'syncAttLogTime': 23 * 60 * 60,      # 23:00:00
         'maxDevLosTime': 12 * 60 * 60,       # 12 hours
-        'getServerCmdInterval': 3 * 60      # 10 min
+        'getServerCmdInterval': 3 * 60       # 10 min
     }
 }

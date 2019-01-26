@@ -274,6 +274,7 @@ def add_new_students(students):
 
 @mongodb_update_one
 def update_student(clock_sn, user):
+    user['sn'] = clock_sn
     handle = {
         'collection': 'StudentInfo',
         'query': {'sn': clock_sn, 'PIN': user['PIN']},
@@ -285,22 +286,27 @@ def update_student(clock_sn, user):
 def update_student_fp(clock_sn, data):
     student_info = get_student(clock_sn, data['PIN'])
     finger_was_updated = False
-    for finger in student_info['fingers']:
-        if finger['FID'] == int(data['FID']):
-            finger['Size'] = data['Size']
-            finger['TMP'] = data['TMP']
-            finger_was_updated = True
-            break
+    if 'fingers' in student_info:
+        for finger in student_info['fingers']:
+            if finger['FID'] == int(data['FID']):
+                finger['Size'] = data['Size']
+                finger['TMP'] = data['TMP']
+                finger_was_updated = True
+                break
+    else:
+        student_info['fingers'] = []
 
     if finger_was_updated is False:
         tmp = {
             'FID': int(data['FID']),
             'Size': data['Size'],
-            'TMP': data['TMP']
+            'TMP': data['TMP'],
+            'Valid': 1
         }
         student_info['fingers'].append(tmp)
 
     # print(student_info)
+    student_info['sn'] = clock_sn
     return update_student(clock_sn, student_info)
 
 

@@ -9,7 +9,7 @@ def dispatch_commands(command, content=None):
     feedbacks = []
     for (k, v) in command.items():
         if k in IClockInterfaceList:
-            LTraceDebug(type(IClockInterfaceList[k]).__name__)
+            # LTraceDebug(type(IClockInterfaceList[k]).__name__)
             if type(IClockInterfaceList[k]).__name__ == 'dict':
                 if v in IClockInterfaceList[k]:
                     feedbacks += IClockInterfaceList[k][v](command['SN'], command, content)
@@ -43,7 +43,7 @@ class CdataHandler(RequestHandler):
         LTraceDebug('CdataHandler post in')
         # print('CdataHandler post in')
         content = str(self.request.body, encoding="gbk")
-        # print(content)
+        LTraceDebug(content)
         args = self.request.arguments
         command = {}
         for a in args:
@@ -51,7 +51,7 @@ class CdataHandler(RequestHandler):
         if 'SN' not in command:
             LTraceWarn('This Clock Accessing without SN number!!!')
             return
-        # print(command)
+        LTraceDebug(command)
         cmdlines = dispatch_commands(command, content)
         for cmdline in cmdlines:
             self.write(cmdline)

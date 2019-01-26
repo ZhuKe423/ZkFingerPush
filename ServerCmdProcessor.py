@@ -45,7 +45,7 @@ class ServerCmdProcessor:
             db.update_student(self.sn, user)
             LTraceDebug(user['Name']+':'+user['PIN']+' has been updated!!')
             ClockCmdGenerator.update_user_info(self.sn, user)
-            if user['fingers'] is not None:
+            if ('fingers' in user) and (user['fingers'] is not None):
                 for finger in user['fingers']:
                     finger['PIN'] = user['PIN']
                     LTraceDebug('update user finger:' + user['PIN'] + ',' + 'FID=' + str(finger['FID']) + 'Size:' + str(finger['Size']))
