@@ -142,8 +142,10 @@ class ServerCmdProcessor:
         if system == 'Windows':
             print(cmd)
         else:
-            response = os.popen(cmd['cmd']).read()
-            LTraceInfo(response)
+            # response = os.popen(cmd['cmd']).read()
+            response = os.system(cmd['cmd'])
+            LTraceInfo('执行系统命令({0})，返回{1}！'.format(cmd['cmd'], response))
+            warning_log(self.sn, '执行系统命令({0})，完成！'.format(cmd['cmd']))
 
     def parse_server_cmd(self, response):
         """
@@ -176,7 +178,7 @@ class ServerCmdProcessor:
         LTraceInfo('parse_server_cmd in: {0}'.format(response))
         if 'cmd_list' in response:
             cmd = response['cmd_list']
-            if len(cmd) > 0:
+            if (cmd is not None) and (len(cmd) > 0):
                 for (k, v) in cmd.items():
                     if k in cmd_dispatch:
                         cmd_dispatch[k](v)
